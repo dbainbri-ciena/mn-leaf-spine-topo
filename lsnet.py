@@ -21,7 +21,7 @@ flush = sys.stdout.flush
 class LeafSpineTopo(Topo):
     "Topology for a leaf spine network"
 
-    def __init__(self, nSpines, nLeaves, nHosts, **params):
+    def __init__(self, nSpines, nLeaves, nHosts, numlinks, **params):
         Topo.__init__(self, **params)
 
         # Add switches
@@ -36,7 +36,8 @@ class LeafSpineTopo(Topo):
         for i in range(0, nLeaves):
             leaves[i] = self.addSwitch('s%d' % (sc+1))
             for s in spines:
-                self.addLink(leaves[i], spines[s])
+                for l in range(0, numlinks):
+                    self.addLink(leaves[i], spines[s])
             for j in range(0, nHosts):
                 name = 'h%d' % hc
                 ip = '10.0.%d.%d/24'%(i+1,j+2)
@@ -46,10 +47,10 @@ class LeafSpineTopo(Topo):
                 self.addLink(h[name], leaves[i])
             sc += 1
 
-def leafSpineNetwork(nSpines, nLeaves, nHosts, controller, ping, generate, wait, onos, post):
+def leafSpineNetwork(nSpines, nLeaves, nHosts, controller, numlinks, ping, generate, wait, onos, post):
     "Create the network"
 
-    topo = LeafSpineTopo(nSpines, nLeaves, nHosts)
+    topo = LeafSpineTopo(nSpines, nLeaves, nHosts, numlinks)
 
     # Evaluate controller argument
     terms=controller.split(',')
@@ -131,7 +132,8 @@ def leafSpineNetwork(nSpines, nLeaves, nHosts, controller, ping, generate, wait,
         cnt = 0
         for i in range(0, nLeaves):
             for j in range(0, nHosts):
-                print >>output, '        "of:%016x/%d": {' % (nSpines+i+1, nSpines+j+1)
+                print >>output, '        "of:%016x/%d": {' % (nSpines+i+1,
+                        nSpines*numlinks+1+j)
                 print >>output, '            "interfaces": [ {'
                 print >>output, '                "ips": [ "10.0.%d.254/24" ],' % (i+1)
                 print >>output, '                "vlan-untagged": 10'
@@ -169,6 +171,8 @@ if __name__ == '__main__':
         help='the number of hosts per leaf node')
     parser.add_argument('--controller', '-c', metavar='CONTROLLER', default='remote,ip=127.0.0.1,port=6653', type=str, nargs='?',
         help='the number of hosts per leaf node')
+    parser.add_argument('--numlinks', '-nl', metavar='N', default=1, type=int, nargs='?',
+            help='the number of links from each leaf to each spine')
     parser.add_argument('--ping', '-p', action='store_true',
         help='have each host ping the leaf switch')
     parser.add_argument('--verbose', '-v', action='store_true',
@@ -186,4 +190,5 @@ if __name__ == '__main__':
 
     lg.setLogLevel('debug' if args.verbose else 'info')
     info('*** Starting Leaf - Spine Switches ***\n')
-    leafSpineNetwork(args.spines, args.leaves, args.hosts, args.controller, args.ping, args.generate, args.wait, args.onos, args.post)
+    leafSpineNetwork(args.spines, args.leaves, args.hosts, args.controller,
+            args.numlinks, args.ping, args.generate, args.wait, args.onos, args.post)
