@@ -47,7 +47,8 @@ class LeafSpineTopo(Topo):
                 self.addLink(h[name], leaves[i])
             sc += 1
 
-def leafSpineNetwork(nSpines, nLeaves, nHosts, controller, numlinks, ping, generate, wait, onos, post):
+def leafSpineNetwork(nSpines, nLeaves, nHosts, controller, numlinks, ping,
+        generate, wait, onos, post, driver):
     "Create the network"
 
     topo = LeafSpineTopo(nSpines, nLeaves, nHosts, numlinks)
@@ -109,7 +110,7 @@ def leafSpineNetwork(nSpines, nLeaves, nHosts, controller, numlinks, ping, gener
             print >>output, '            },'
             print >>output, '            "basic": {'
             print >>output, '                "name": "Spine%d",' % (i+1)
-            print >>output, '                "driver": "ofdpa-ovs"'
+            print >>output, '                "driver": "%s"' % driver
             print >>output, '            }'
             print >>output, '        },'
         for i in range(0, nLeaves):
@@ -124,7 +125,7 @@ def leafSpineNetwork(nSpines, nLeaves, nHosts, controller, numlinks, ping, gener
             print >>output, '            },'
             print >>output, '            "basic": {'
             print >>output, '                "name": "Leaf%d",' % (i+1)
-            print >>output, '                "driver": "ofdpa-ovs"'
+            print >>output, '                "driver": "%s"' % driver
             print >>output, '            }'
             print >>output, '        }%s' % (',' if i+1 < nLeaves else '')
         print >>output, '    },'
@@ -185,10 +186,13 @@ if __name__ == '__main__':
         help='ONOS base URL')
     parser.add_argument('--post', '-d', action='store_true',
         help='post configuration to onos')
+    parser.add_argument('--driver', '-r', metavar='NAME', default='ofdpa-ovs', type=str, nargs='?',
+        help='device driver to use in the ONOS configuration')
 
     args = parser.parse_args()
 
     lg.setLogLevel('debug' if args.verbose else 'info')
     info('*** Starting Leaf - Spine Switches ***\n')
     leafSpineNetwork(args.spines, args.leaves, args.hosts, args.controller,
-            args.numlinks, args.ping, args.generate, args.wait, args.onos, args.post)
+            args.numlinks, args.ping, args.generate, args.wait, args.onos,
+            args.post, args.driver)

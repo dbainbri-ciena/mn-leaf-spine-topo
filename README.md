@@ -13,7 +13,7 @@ cd /vagrant
 
 ### Start the SDN Controller
 The script which wraps the leaf-spine topology only supports ONOS currently.
-To start and instance of the ONOS controller as container the following 
+To start and instance of the ONOS controller as container the following
 command should work.
 ```
 docker run -tid --name onos --rm \
@@ -47,7 +47,7 @@ more debug output from the script as the topology is created_
 prompt it really doesn't work. But if you `ctrl-D` out of mininet and restart
 it with the same parameters and then do a `pingall` it seems to work. I think
 this has something to do with a required order in ONOS between the config push
-and the devices being connected and I consider it a big in ONOS or the SR 
+and the devices being connected and I consider it a big in ONOS or the SR
 application.**
 
 ### PingAll
@@ -77,3 +77,32 @@ To revert to the default layout use
 ssh -p 8101 karaf@localhost topo-layout default
 ```
 _NOTE: the default password is `karaf`_
+
+## Full Options
+```
+usage: lsnet.py [-h] [--leaves [N]] [--spines [N]] [--hosts [N]]
+                [--controller [CONTROLLER]] [--numlinks [N]] [--ping]
+                [--verbose] [--generate] [--wait] [--onos [ONOS]] [--post]
+                [--driver [NAME]]
+
+Process some integers.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --leaves [N], -l [N]  the number of leaf nodes
+  --spines [N], -s [N]  the number of spine nodes
+  --hosts [N], -t [N]   the number of hosts per leaf node
+  --controller [CONTROLLER], -c [CONTROLLER]
+                        the number of hosts per leaf node
+  --numlinks [N], -nl [N]
+                        the number of links from each leaf to each spine
+  --ping, -p            have each host ping the leaf switch
+  --verbose, -v         display a bit more detailed logging
+  --generate, -g        gerate ONOS network configuration for fabric
+  --wait, -w            wait for switches to connect to controller
+  --onos [ONOS], -o [ONOS]
+                        ONOS base URL
+  --post, -d            post configuration to onos
+  --driver [NAME], -r [NAME]
+                        device driver to use in the ONOS configuration
+```
