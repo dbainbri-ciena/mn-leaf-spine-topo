@@ -23,6 +23,7 @@ class LeafSpineTopo(Topo):
 
     def __init__(self, nSpines, nLeaves, nHosts, numlinks, **params):
         Topo.__init__(self, **params)
+        error(params)
 
         # Add switches
         spines={}
@@ -51,7 +52,7 @@ def leafSpineNetwork(nSpines, nLeaves, nHosts, controller, numlinks, ping,
         generate, wait, onos, post, driver):
     "Create the network"
 
-    topo = LeafSpineTopo(nSpines, nLeaves, nHosts, numlinks)
+    topo = LeafSpineTopo(nSpines, nLeaves, nHosts, numlinks, test=3)
 
     # Evaluate controller argument
     terms=controller.split(',')
